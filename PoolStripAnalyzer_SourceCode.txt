@@ -1,0 +1,52 @@
+
+// PoolStripAnalyzer.java (simplified logic)
+
+import org.opencv.core.*;
+import org.opencv.imgproc.Imgproc;
+import android.graphics.Bitmap;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PoolStripAnalyzer {
+    public List<String> analyzeStrip(Bitmap inputImage) {
+        List<String> results = new ArrayList<>();
+
+        // Convert to OpenCV Mat
+        Mat mat = new Mat();
+        Utils.bitmapToMat(inputImage, mat);
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB);
+
+        // Segment strip and guide regions
+        Rect[] regions = detectColorRegions(mat);
+
+        // Compare colors
+        for (int i = 0; i < regions.length; i++) {
+            Scalar averageColor = computeAverageColor(mat.submat(regions[i]));
+            String matchedValue = matchToReference(averageColor, i);
+            results.add(matchedValue);
+        }
+
+        return results;
+    }
+
+    private Rect[] detectColorRegions(Mat image) {
+        // Placeholder logic: return fixed regions for now
+        return new Rect[] {
+            new Rect(50, 50, 50, 50),   // Free Chlorine
+            new Rect(120, 50, 50, 50),  // Alkalinity
+            new Rect(190, 50, 50, 50)   // pH
+        };
+    }
+
+    private Scalar computeAverageColor(Mat region) {
+        return Core.mean(region);
+    }
+
+    private String matchToReference(Scalar color, int parameterIndex) {
+        // Placeholder: compare to predefined RGB or LAB values
+        if (parameterIndex == 0) return "Free Chlorine: 2.0 ppm";
+        if (parameterIndex == 1) return "Alkalinity: 80 ppm";
+        if (parameterIndex == 2) return "pH: 7.6";
+        return "Unknown";
+    }
+}
